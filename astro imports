@@ -7,3 +7,30 @@ from matplotlib.pyplot import figure
 import json
 from datetime import datetime, timedelta
 import calendar
+
+user_location = input("Where will you be stargazing? ")
+api_url = 'http://api.positionstack.com/v1/forward?'
+payload = {
+    "access_key" : 'bdb5594a0e0f750a4aaeeb3509a8ff17',
+    "query" : user_location,
+    "timezone_module":1
+}
+
+response = requests.get(api_url, params=payload)
+status_code = response.status_code
+if status_code == 200: 
+  response_data = response.json()
+  location_data = response_data['data']
+  location_dict = location_data[0]
+  user_lat = round(location_dict.get('latitude'), 3)
+  user_lon = round(location_dict.get('longitude'), 3)
+  user_loc = str(user_lat )+ ',' + str(user_lon)
+  timezone_dict = location_dict.get('timezone_module')
+  user_tz_offset = timezone_dict.get('offset_string')
+  user_tz = timezone_dict.get('name')
+  user_lon_lat = str(user_lon) + "," + str(user_lat)
+  locality = location_dict.get('region_code')
+  city = location_dict.get('name')
+  city_state = city + ", "+ locality
+else:
+  print(f"Unsucessful request: {status_code}, {response.text}")
